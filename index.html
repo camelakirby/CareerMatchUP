@@ -50,6 +50,11 @@
             align-items: center;
             cursor: pointer;
             background-color: #e0e0e0;
+            transition: background-color 0.3s;
+        }
+
+        .path-step:hover {
+            background-color: #d0d0d0;
         }
 
         #scenario {
@@ -67,13 +72,17 @@
             cursor: pointer;
             margin: 10px;
         }
+
+        .choice-button {
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Career Path Match-Up: The Interactive Game</h1>
-            <p>Match careers with the appropriate education, skills, and job tasks to move forward on your career path journey.</p>
+            <p>Match careers with the appropriate education, skills, and job tasks to move forward on your career path journey. Each team takes turns to make decisions. Correct choices earn points!</p>
             <button id="startGame">Start Game</button>
         </header>
         
@@ -84,6 +93,7 @@
             <div id="scenario" class="scenario-box" style="display:none;">
                 <!-- Pop-up scenarios will appear here -->
                 <p id="scenarioText"></p>
+                <div id="choices"></div> <!-- Div to contain choice buttons -->
             </div>
         </main>
 
@@ -114,11 +124,11 @@
 
         const pathSteps = [
             { text: "Start", scenario: null },
-            { text: "High School", scenario: "You graduated high school. Do you: (A) Go to college (B) Start working", choices: ["Go to college", "Start working"], correctChoice: 0 },
-            { text: "College", scenario: "You chose college. What major do you pick? (A) Biology (B) Business", choices: ["Biology", "Business"], correctChoice: 0 },
-            { text: "Skills Training", scenario: "You decided to get additional skills training. Choose a skill to focus on. (A) Animal Care (B) IT Support", choices: ["Animal Care", "IT Support"], correctChoice: 0 },
-            { text: "Job Search", scenario: "You are ready to find a job. What is your career goal? (A) Veterinarian (B) IT Technician", choices: ["Veterinarian", "IT Technician"], correctChoice: 0 },
-            { text: "Veterinarian", scenario: "You want to become a veterinarian; what educational path do you choose next? (A) Veterinary School (B) Work Experience", choices: ["Veterinary School", "Work Experience"], correctChoice: 0 },
+            { text: "High School", scenario: "You graduated high school. What should you do next to become a Veterinarian?", choices: ["Go to college", "Start working"], correctChoice: 0, feedback: ["Correct! Going to college is the first step to becoming a Veterinarian.", "Incorrect. Becoming a Veterinarian requires a college degree."] },
+            { text: "College", scenario: "You chose to go to college. What major do you pick to further your Veterinary career?", choices: ["Biology", "Business"], correctChoice: 0, feedback: ["Correct! Biology is a suitable major for a career in Veterinary Science.", "Incorrect. Business is not a related major for becoming a Veterinarian."] },
+            { text: "Skills Training", scenario: "You decided to get additional skills training. Choose a skill to focus on for Veterinary practice.", choices: ["Animal Care", "IT Support"], correctChoice: 0, feedback: ["Correct! Animal Care is crucial for a Veterinary career.", "Incorrect. IT Support is not relevant to Veterinary science."] },
+            { text: "Job Search", scenario: "You are ready to find a job. What is your career goal?", choices: ["Veterinarian", "IT Technician"], correctChoice: 0, feedback: ["Correct! Veterinarian is the career path we are aiming for!", "Incorrect. IT Technician is not related to becoming a Veterinarian."] },
+            { text: "Veterinarian", scenario: "You want to become a Veterinarian; what educational path do you choose next?", choices: ["Veterinary School", "Work Experience"], correctChoice: 0, feedback: ["Correct! Attending Veterinary School is necessary to become a Veterinarian.", "Incorrect. Practical work experience is valuable but attending Veterinary School is essential."] },
             { text: "End", scenario: null }
         ];
 
@@ -141,39 +151,44 @@
 
         function displayScenario(stepIndex) {
             const scenarioContainer = document.getElementById("scenario");
+            const scenarioText = document.getElementById("scenarioText");
+            const choicesContainer = document.getElementById("choices");
+            scenarioContainer.style.display = "block"; // Show the scenario container
+
             scenarioContainer.innerHTML = ''; // Clear previous content
-            const scenarioText = document.createElement("p"); // Dynamically create scenario text element
+            choicesContainer.innerHTML = ''; // Clear previous choices
+
             const currentStep = pathSteps[stepIndex];
 
             if (currentStep.scenario) {
-                scenarioContainer.style.display = "block";
                 scenarioText.textContent = currentStep.scenario;
                 scenarioContainer.appendChild(scenarioText);
-                displayChoices(currentStep.choices, currentStep.correctChoice);
+                displayChoices(currentStep.choices, currentStep.correctChoice, currentStep.feedback);
             } else {
                 scenarioContainer.style.display = "none";
             }
         }
 
-        function displayChoices(choices, correctChoiceIndex) {
-            const scenarioContainer = document.getElementById("scenario");
+        function displayChoices(choices, correctChoiceIndex, feedback) {
+            const choicesContainer = document.getElementById("choices");
             choices.forEach((choice, index) => {
                 const button = document.createElement("button");
+                button.classList.add("choice-button");
                 button.textContent = choice;
-                button.onclick = () => handleChoice(index, correctChoiceIndex);
-                scenarioContainer.appendChild(button);
+                button.onclick = () => handleChoice(index, correctChoiceIndex, feedback);
+                choicesContainer.appendChild(button);
             });
         }
 
-        function handleChoice(selectedChoiceIndex, correctChoiceIndex) {
+        function handleChoice(selectedChoiceIndex, correctChoiceIndex, feedback) {
             const scenarioContainer = document.getElementById("scenario");
             scenarioContainer.innerHTML = ''; // Clear choices for the next step
 
             if (selectedChoiceIndex === correctChoiceIndex) {
                 teams[currentTeam].points += 10;
-                alert(`Correct! ${teams[currentTeam].name} earns 10 points!`);
+                alert(`${feedback[0]} ${teams[currentTeam].name} earns 10 points!`);
             } else {
-                alert('Incorrect choice. No points earned.');
+                alert(`${feedback[1]} No points earned.`);
             }
 
             // Switch to the next team
@@ -191,15 +206,4 @@
         function endGame() {
             const scenarioContainer = document.getElementById("scenario");
             scenarioContainer.innerHTML = ''; // Clear scenario for end game message
-            scenarioContainer.style.display = "block";
-
-            const winner = teams[0].points === teams[1].points ? "It's a tie!" : (teams[0].points > teams[1].points ? teams[0].name : teams[1].name) + " wins!";
-            scenarioContainer.innerHTML = `
-                <h2>Game Over!</h2>
-                <p>${winner}</p>
-                <p>Final Scores: ${teams[0].name}: ${teams[0].points}, ${teams[1].name}: ${teams[1].points}</p>
-            `;
-        }
-    </script>
-</body>
-</html>
+            scenarioContainer.style.display
