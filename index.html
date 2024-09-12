@@ -112,4 +112,94 @@
             displayScenario(currentStepIndex);
         }
 
-        const pathSte
+        const pathSteps = [
+            { text: "Start", scenario: null },
+            { text: "High School", scenario: "You graduated high school. Do you: (A) Go to college (B) Start working", choices: ["Go to college", "Start working"], correctChoice: 0 },
+            { text: "College", scenario: "You chose college. What major do you pick? (A) Biology (B) Business", choices: ["Biology", "Business"], correctChoice: 0 },
+            { text: "Skills Training", scenario: "You decided to get additional skills training. Choose a skill to focus on. (A) Animal Care (B) IT Support", choices: ["Animal Care", "IT Support"], correctChoice: 0 },
+            { text: "Job Search", scenario: "You are ready to find a job. What is your career goal? (A) Veterinarian (B) IT Technician", choices: ["Veterinarian", "IT Technician"], correctChoice: 0 },
+            { text: "Veterinarian", scenario: "You want to become a veterinarian; what educational path do you choose next? (A) Veterinary School (B) Work Experience", choices: ["Veterinary School", "Work Experience"], correctChoice: 0 },
+            { text: "End", scenario: null }
+        ];
+
+        function createGamePath() {
+            const pathContainer = document.getElementById("path");
+            pathContainer.innerHTML = ''; // Clear existing path elements if any
+            pathSteps.forEach((step, index) => {
+                const stepDiv = document.createElement("div");
+                stepDiv.classList.add("path-step");
+                stepDiv.textContent = step.text;
+                stepDiv.addEventListener("click", () => handleStepClick(index));
+                pathContainer.appendChild(stepDiv);
+            });
+        }
+
+        function handleStepClick(index) {
+            currentStepIndex = index;
+            displayScenario(currentStepIndex);
+        }
+
+        function displayScenario(stepIndex) {
+            const scenarioContainer = document.getElementById("scenario");
+            scenarioContainer.innerHTML = ''; // Clear previous content
+            const scenarioText = document.createElement("p"); // Dynamically create scenario text element
+            const currentStep = pathSteps[stepIndex];
+
+            if (currentStep.scenario) {
+                scenarioContainer.style.display = "block";
+                scenarioText.textContent = currentStep.scenario;
+                scenarioContainer.appendChild(scenarioText);
+                displayChoices(currentStep.choices, currentStep.correctChoice);
+            } else {
+                scenarioContainer.style.display = "none";
+            }
+        }
+
+        function displayChoices(choices, correctChoiceIndex) {
+            const scenarioContainer = document.getElementById("scenario");
+            choices.forEach((choice, index) => {
+                const button = document.createElement("button");
+                button.textContent = choice;
+                button.onclick = () => handleChoice(index, correctChoiceIndex);
+                scenarioContainer.appendChild(button);
+            });
+        }
+
+        function handleChoice(selectedChoiceIndex, correctChoiceIndex) {
+            const scenarioContainer = document.getElementById("scenario");
+            scenarioContainer.innerHTML = ''; // Clear choices for the next step
+
+            if (selectedChoiceIndex === correctChoiceIndex) {
+                teams[currentTeam].points += 10;
+                alert(`Correct! ${teams[currentTeam].name} earns 10 points!`);
+            } else {
+                alert('Incorrect choice. No points earned.');
+            }
+
+            // Switch to the next team
+            currentTeam = (currentTeam + 1) % teams.length;
+
+            // Move to the next step
+            currentStepIndex++;
+            if (currentStepIndex < pathSteps.length) {
+                displayScenario(currentStepIndex);
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            const scenarioContainer = document.getElementById("scenario");
+            scenarioContainer.innerHTML = ''; // Clear scenario for end game message
+            scenarioContainer.style.display = "block";
+
+            const winner = teams[0].points === teams[1].points ? "It's a tie!" : (teams[0].points > teams[1].points ? teams[0].name : teams[1].name) + " wins!";
+            scenarioContainer.innerHTML = `
+                <h2>Game Over!</h2>
+                <p>${winner}</p>
+                <p>Final Scores: ${teams[0].name}: ${teams[0].points}, ${teams[1].name}: ${teams[1].points}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
