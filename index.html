@@ -76,17 +76,28 @@
         .choice-button {
             margin: 5px;
         }
+
+        #objective {
+            font-size: 18px;
+            margin: 20px;
+            padding: 10px;
+            background-color: #e8f0fe;
+            border: 1px solid #c0c0c0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Career Path Match-Up: The Interactive Game</h1>
-            <p>Match careers with the appropriate education, skills, and job tasks to move forward on your career path journey. Each team takes turns to make decisions. Correct choices earn points!</p>
+            <p>Make decisions that align with becoming a veterinarian. Each correct choice will bring you closer to achieving your career goal!</p>
             <button id="startGame">Start Game</button>
         </header>
         
         <main id="gameBoard" style="display:none;">
+            <div id="objective">
+                <p>Your goal is to become a veterinarian. Choose the best path to achieve this career!</p>
+            </div>
             <div id="path">
                 <!-- The game path will be dynamically created here -->
             </div>
@@ -100,6 +111,7 @@
         <footer>
             <p>Develop decision-making, teamwork, and career planning skills with this fun and educational game!</p>
         </footer>
+
     </div>
 
     <script>
@@ -124,11 +136,11 @@
 
         const pathSteps = [
             { text: "Start", scenario: null },
-            { text: "High School", scenario: "You graduated high school. What should you do next to become a Veterinarian?", choices: ["Go to college", "Start working"], correctChoice: 0, feedback: ["Correct! Going to college is the first step to becoming a Veterinarian.", "Incorrect. Becoming a Veterinarian requires a college degree."] },
-            { text: "College", scenario: "You chose to go to college. What major do you pick to further your Veterinary career?", choices: ["Biology", "Business"], correctChoice: 0, feedback: ["Correct! Biology is a suitable major for a career in Veterinary Science.", "Incorrect. Business is not a related major for becoming a Veterinarian."] },
-            { text: "Skills Training", scenario: "You decided to get additional skills training. Choose a skill to focus on for Veterinary practice.", choices: ["Animal Care", "IT Support"], correctChoice: 0, feedback: ["Correct! Animal Care is crucial for a Veterinary career.", "Incorrect. IT Support is not relevant to Veterinary science."] },
-            { text: "Job Search", scenario: "You are ready to find a job. What is your career goal?", choices: ["Veterinarian", "IT Technician"], correctChoice: 0, feedback: ["Correct! Veterinarian is the career path we are aiming for!", "Incorrect. IT Technician is not related to becoming a Veterinarian."] },
-            { text: "Veterinarian", scenario: "You want to become a Veterinarian; what educational path do you choose next?", choices: ["Veterinary School", "Work Experience"], correctChoice: 0, feedback: ["Correct! Attending Veterinary School is necessary to become a Veterinarian.", "Incorrect. Practical work experience is valuable but attending Veterinary School is essential."] },
+            { text: "High School", scenario: "You graduated high school. What should you do next to work towards becoming a veterinarian?", choices: ["Go to college", "Start working"], correctChoice: 0, feedback: ["Correct! Going to college is the first step to becoming a veterinarian.", "Incorrect. Becoming a veterinarian requires a college degree."] },
+            { text: "College", scenario: "You chose to go to college. What major should you pick to further your veterinary career?", choices: ["Biology", "Business"], correctChoice: 0, feedback: ["Correct! Biology is a suitable major for a career in veterinary science. It provides the necessary foundation in biology and animal sciences.", "Incorrect. Business is not related to the science or medical fields required for becoming a veterinarian. You need a major like Biology to prepare for Veterinary School."] },
+            { text: "Skills Training", scenario: "You decided to get additional skills training to enhance your veterinary career. Which skill should you focus on?", choices: ["Animal Care", "IT Support"], correctChoice: 0, feedback: ["Correct! Animal Care is crucial for a veterinary career.", "Incorrect. IT Support is not relevant to veterinary science."] },
+            { text: "Job Search", scenario: "You are ready to find a job. Which career should you aim for to stay on the path to becoming a veterinarian?", choices: ["Veterinarian", "IT Technician"], correctChoice: 0, feedback: ["Correct! Veterinarian is the career path we are aiming for!", "Incorrect. IT Technician is not related to becoming a veterinarian."] },
+            { text: "Veterinarian", scenario: "You want to become a veterinarian; what educational path should you choose next?", choices: ["Veterinary School", "Work Experience"], correctChoice: 0, feedback: ["Correct! Attending Veterinary School is necessary to become a veterinarian.", "Incorrect. Practical work experience is valuable but attending Veterinary School is essential."] },
             { text: "End", scenario: null }
         ];
 
@@ -206,4 +218,15 @@
         function endGame() {
             const scenarioContainer = document.getElementById("scenario");
             scenarioContainer.innerHTML = ''; // Clear scenario for end game message
-            scenarioContainer.style.display
+            scenarioContainer.style.display = "block";
+
+            const winner = teams[0].points === teams[1].points ? "It's a tie!" : (teams[0].points > teams[1].points ? teams[0].name : teams[1].name) + " wins!";
+            scenarioContainer.innerHTML = `
+                <h2>Game Over!</h2>
+                <p>${winner}</p>
+                <p>Final Scores: ${teams[0].name}: ${teams[0].points}, ${teams[1].name}: ${teams[1].points}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
